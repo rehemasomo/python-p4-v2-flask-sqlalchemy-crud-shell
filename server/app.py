@@ -22,4 +22,47 @@ db.init_app(app)
 
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5556, debug=True)
+
+
+# Add a new Pet 
+@app.route('/add_pet')
+def add_pet():
+    # new Pet instance
+    pet1 = Pet(name='Fido', species='Dog')
+
+    db.session.add(pet1)
+
+    # Commit 
+    db.session.commit()
+
+    return 'Added a new pet!'
+
+@app.route('/pets')
+def get_pets():
+    pets = Pet.query.all()
+    return {'pets': [pet.__repr__() for pet in pets]}
+
+# Update 
+@app.route('/update_pet/<int:id>')
+def update_pet(id):
+    # Retrieve pet
+    pet = Pet.query.get(id)
+    if pet:
+        # Update
+        pet.name = 'Fido the Mighty'
+        db.session.commit()
+        return f'Updated pet with id {id}'
+    return f'Pet with id {id} not found'
+
+# Delete
+@app.route('/delete_pet/<int:id>')
+def delete_pet(id):
+    # Retrieve pet
+    pet = Pet.query.get(id)
+    if pet:
+        # Delete the Pet 
+        db.session.delete(pet)
+        db.session.commit()
+        return f'Deleted pet with id {id}'
+    return f'Pet with id {id} not found'
